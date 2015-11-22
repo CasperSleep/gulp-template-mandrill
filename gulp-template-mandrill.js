@@ -3,7 +3,6 @@ var through   = require('through2'),
   gutil       = require('gulp-util'),
   fs          = require('fs'),
   path        = require('path'),
-  html2txt    = require('html-to-text');
   PluginError = gutil.PluginError;
 
 const PLUGIN_NAME = 'gulp-template-mandrill';
@@ -41,15 +40,12 @@ function gulpTemplateMandrill(opts) {
 
       // set html and txt from file
       params.code = file.contents.toString();
-      params.text = new Buffer(
-          html2txt.fromString(file.contents.toString())
-        ).toString();
 
       // send to api via mandrill-api
-      mandrill.templates.update( 
+      mandrill.templates.update(
         params,
         function (result) {
-          console.log('Updated template:', result.slug);
+          gutil.log(gutil.colors.green('Updated template: ' + result.slug));
         },
         function (e) {
           // If the template doesn't exist, add it
@@ -57,7 +53,7 @@ function gulpTemplateMandrill(opts) {
             mandrill.templates.add(
               params,
               function (result) {
-                console.log('New template', result.slug);
+                gutil.log(gutil.colors.green('New template: ' + result.slug));
               },
               function (e) {
                 throw new PluginError(PLUGIN_NAME, 'Mandrill error occurred: ' +
